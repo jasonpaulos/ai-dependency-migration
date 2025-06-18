@@ -18,19 +18,21 @@ IChatClient client =
     .UseFunctionInvocation()
     .Build();
 
+var rootDir = Path.GetDirectoryName(Directory.GetCurrentDirectory());
+
 // Create the MCP client
 // Configure it to start and connect to your MCP server.
-// IMcpClient mcpClient = await McpClientFactory.CreateAsync(
-//     new StdioClientTransport(new()
-//     {
-//         Command = "dotnet run",
-//         Arguments = ["--project", "<path-to-your-mcp-server-project>"],
-//         Name = "Minimal MCP Server",
-//     }));
+IMcpClient mcpClient = await McpClientFactory.CreateAsync(
+    new StdioClientTransport(new()
+    {
+        Command = "dotnet run",
+        Arguments = ["--project", Path.Join(rootDir, @"FileSystemMcpServer/FileSystemMcpServer.csproj")],
+        Name = "Minimal MCP Server",
+    }));
 
 // List all available tools from the MCP server.
 Console.WriteLine("Available tools:");
-IList<McpClientTool> tools = [];// await mcpClient.ListToolsAsync();
+IList<McpClientTool> tools = await mcpClient.ListToolsAsync();
 foreach (McpClientTool tool in tools)
 {
     Console.WriteLine($"{tool}");
