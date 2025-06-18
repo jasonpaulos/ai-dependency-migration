@@ -31,8 +31,8 @@ IMcpClient mcpClient = await McpClientFactory.CreateAsync(
     new StdioClientTransport(new()
     {
         Command = "dotnet run",
-        Arguments = ["--project", Path.Join(rootDir, @"FileSystemMcpServer/FileSystemMcpServer.csproj")],
-        Name = "Minimal MCP Server",
+        Arguments = ["--project", Path.Join(rootDir, @"McpServer/McpServer.csproj")],
+        Name = "Monolith MCP Server",
     }));
 
 // List all available tools from the MCP server.

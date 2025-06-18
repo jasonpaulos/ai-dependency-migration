@@ -5,9 +5,9 @@ VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AiDependencyMigrator", "AiDependencyMigrator\AiDependencyMigrator.csproj", "{CAEBFCC0-A8FA-E075-CC36-F5884B3EF138}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSystemMcpServer", "FileSystemMcpServer\FileSystemMcpServer.csproj", "{BE1C5377-96EE-4424-856D-DD24975E8D00}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McpServer", "McpServer\McpServer.csproj", "{BE1C5377-96EE-4424-856D-DD24975E8D00}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileSystemMcpServer.Tests", "FileSystemMcpServer.Tests\FileSystemMcpServer.Tests.csproj", "{FAD7E138-4EE8-48D9-AF73-165B2F4C1933}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "McpServer.Tests", "McpServer.Tests\McpServer.Tests.csproj", "{FAD7E138-4EE8-48D9-AF73-165B2F4C1933}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
