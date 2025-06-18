@@ -22,6 +22,22 @@ namespace FileSystemMcpServer.Tests
         }
 
         [Fact]
+        public void WriteFile_ShouldCreateAndWriteToFile()
+        {
+            // Arrange
+            string testFilePath = Path.Combine(_testDirectory, "test.txt");
+            string content = "Hello, World!";
+
+            // Act
+            FileSystemMcpServerTools.WriteFile(testFilePath, content);
+
+            // Assert
+            Assert.True(File.Exists(testFilePath));
+            string actualContent = File.ReadAllText(testFilePath);
+            Assert.Equal(content, actualContent);
+        }
+
+        [Fact]
         public void WriteFileLines_ShouldReplaceSpecifiedLines()
         {
             // Arrange - Create a fresh test file for this test

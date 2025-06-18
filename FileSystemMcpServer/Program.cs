@@ -28,7 +28,12 @@ await builder.Build().RunAsync();
 [McpServerToolType]
 public static class FileSystemMcpServerTools
 {
-    private static string baseDirectory = Path.Join(Path.GetDirectoryName(Directory.GetCurrentDirectory()), "example");
+    private static string baseDirectory = Path.Join(Path.GetDirectoryName(
+        Path.GetDirectoryName(
+            Path.GetDirectoryName(
+                Path.GetDirectoryName(
+                    Path.GetDirectoryName(
+                        AppContext.BaseDirectory))))), "example");
 
     /// <summary>
     /// Sets the base directory for testing purposes.
@@ -64,7 +69,7 @@ public static class FileSystemMcpServerTools
         {
             throw new ArgumentException("Invalid directory path.");
         }
-        return Directory.GetFiles(directory);
+        return [.. Directory.GetFiles(directory).Select(file => Path.GetFileName(file))];
     }
 
     [McpServerTool, Description("Reads the contents of a file.")]

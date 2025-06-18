@@ -18,7 +18,12 @@ IChatClient client =
     .UseFunctionInvocation()
     .Build();
 
-var rootDir = Path.GetDirectoryName(Directory.GetCurrentDirectory());
+var rootDir = Path.GetDirectoryName(
+    Path.GetDirectoryName(
+        Path.GetDirectoryName(
+            Path.GetDirectoryName(
+                Path.GetDirectoryName(
+                    AppContext.BaseDirectory)))));
 
 // Create the MCP client
 // Configure it to start and connect to your MCP server.
@@ -56,6 +61,42 @@ while (true)
     await foreach (ChatResponseUpdate update in client
         .GetStreamingResponseAsync(messages, new() { Tools = [.. tools] }))
     {
+        // Debugging info to show function calls and results.
+        foreach (var content in update.Contents)
+        {
+            if (content is FunctionCallContent functionCallContent)
+            {
+                Console.Write($">> Function call ({functionCallContent.CallId}): {functionCallContent.Name} ");
+                if (functionCallContent.Arguments != null)
+                {
+                    Console.WriteLine("with arguments:");
+                    foreach (var arg in functionCallContent.Arguments)
+                    {
+                        Console.WriteLine($"  {arg.Key}: {arg.Value}");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("with no arguments.");
+                }
+            }
+            else if (content is FunctionResultContent functionResultContent)
+            {
+                Console.Write($">> Function result ({functionResultContent.CallId}): ");
+                if (functionResultContent.Result != null)
+                {
+                    Console.WriteLine($"with result: {functionResultContent.Result}");
+                }
+                else if (functionResultContent.Exception != null)
+                {
+                    Console.WriteLine($"with error: {functionResultContent.Exception}");
+                }
+                else
+                {
+                    Console.WriteLine("with no result.");
+                }
+            }
+        }
         Console.Write(update);
         updates.Add(update);
     }
