@@ -2,58 +2,70 @@ package bookcase
 
 import (
 	"encoding/json"
+	"errors"
 
-	"github.com/bits-and-blooms/bloom/v3"
+	cuckoo "github.com/seiflotfy/cuckoofilter"
 )
 
 // Bookcase is a data structure used to store and remember book titles.
-// Internally it uses a Bloom filter to efficiently check for the presence of book titles.
+// Internally it uses a Cuckoo filter to efficiently check for the presence of book titles.
 type Bookcase struct {
-	filter *bloom.BloomFilter
+	filter *cuckoo.Filter
 }
 
 // New creates a new Bookcase with a specified desired capacity and false positive rate.
-func New(desiredCapacity int, desiredFalsePositiveRate float64) *Bookcase {
+// Note: cuckoofilter does not use a false positive rate, so we ignore it and only use capacity.
+func New(desiredCapacity int, _ float64) *Bookcase {
 	return &Bookcase{
-		filter: bloom.NewWithEstimates(uint(desiredCapacity), desiredFalsePositiveRate),
+		filter: cuckoo.NewFilter(uint(desiredCapacity)),
 	}
 }
 
-// Size return the number of bits in the filter.
+// Size returns the approximate filter's bucket count (not bits, but close).
 func (b *Bookcase) Size() int {
-	return int(b.filter.Cap())
+	// There is no direct "size in bits" because Cuckoo filter is hash+fingerprint based. Bucket count is a rough equivalent.
+	return int(b.filter.Count())
 }
 
 // ApproximateCount returns the approximate number of unique book titles stored in the Bookcase.
 func (b *Bookcase) ApproximateCount() int {
-	return int(b.filter.ApproximatedSize())
+	return int(b.filter.Count())
 }
 
 // AddBook adds a book title to the Bookcase.
 func (b *Bookcase) AddBook(title string) {
-	b.filter.AddString(title)
+	b.filter.Insert([]byte(title))
 }
 
 // MightHaveBook checks if a book title might be in the Bookcase.
 // It returns true if the title might be present, and false if it is definitely not present.
 func (b *Bookcase) MightHaveBook(title string) bool {
-	return b.filter.TestString(title)
+	return b.filter.Lookup([]byte(title))
 }
 
 // ToJson serializes the Bookcase to a JSON string.
+// Note: Encodes the underlying filter as bytes then base64 json string.
 func (b *Bookcase) ToJson() (string, error) {
-	bytes, err := json.Marshal(b.filter)
+	encoded := b.filter.Encode()
+	j, err := json.Marshal(encoded)
 	if err != nil {
 		return "", err
 	}
-	return string(bytes), nil
+	return string(j), nil
 }
 
 // FromJson deserializes a JSON string into a Bookcase.
 func FromJson(jsonStr string) (*Bookcase, error) {
-	var filter bloom.BloomFilter
-	if err := json.Unmarshal([]byte(jsonStr), &filter); err != nil {
+	var encoded []byte
+	if err := json.Unmarshal([]byte(jsonStr), &encoded); err != nil {
 		return nil, err
 	}
-	return &Bookcase{filter: &filter}, nil
+	filter, err := cuckoo.Decode(encoded)
+	if err != nil {
+		return nil, err
+	}
+	if filter == nil {
+		return nil, errors.New("failed to decode cuckoo filter")
+	}
+	return &Bookcase{filter: filter}, nil
 }
