@@ -14,7 +14,7 @@ func main() {
 
 	reader := bufio.NewReader(os.Stdin)
 
-	fmt.Println("Welcome to the Bookcase program! Enter a command below. Valid commands are: 'add', 'check', 'json', and 'exit'.")
+	fmt.Println("Welcome to the Bookcase program! Enter a command below. Valid commands are: 'add', 'check', 'clear', 'json', and 'exit'.")
 
 	for {
 		fmt.Print("Enter command: ")
@@ -54,6 +54,9 @@ func main() {
 			} else {
 				fmt.Printf("The book \"%s\" is definitely not in the bookcase.\n", title)
 			}
+		case "clear":
+			bookcase.Clear()
+			fmt.Println("Bookcase cleared.")
 		case "json":
 			jsonStr, err := bookcase.ToJson()
 			if err != nil {

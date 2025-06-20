@@ -44,8 +44,6 @@ foreach (McpClientTool tool in tools)
 }
 Console.WriteLine();
 
-// Update my go project to use the package github.com/seiflotfy/cuckoofilter instead of github.com/bits-and-blooms/bloom/v3
-
 // Conversational loop that can utilize the tools via prompts.
 List<ChatMessage> messages =  [
         new ChatMessage(ChatRole.System, """
@@ -63,14 +61,25 @@ List<ChatMessage> messages =  [
         """)
     ];
 
-Console.Write("Prompt: ");
-messages.Add(new(ChatRole.User, Console.ReadLine()));
+var prompt = "Update my go project to use the package github.com/seiflotfy/cuckoofilter instead of github.com/bits-and-blooms/bloom/v3";
+Console.Write("Prompt: " + prompt);
+messages.Add(new(ChatRole.User, prompt));
 
 while (true)
 {
     if (messages.Last().Role == ChatRole.Assistant)
     {
-        break;
+        if (messages.Last().ToString() == "Migration complete. See migration_summary.md for details.")
+        {
+            Console.WriteLine(messages.Last());
+            break;
+        }
+        else
+        {
+            Console.Write("Something went wrong");
+            Console.WriteLine(messages.Last());
+            Environment.Exit(1);
+        }
     }
 
     List<ChatResponseUpdate> updates = [];
@@ -121,5 +130,3 @@ while (true)
 
     messages.AddMessages(updates);
 }
-
-Console.WriteLine("Exiting");

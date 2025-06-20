@@ -19,14 +19,14 @@ func New(desiredCapacity int, desiredFalsePositiveRate float64) *Bookcase {
 	}
 }
 
-// Size return the number of bits in the filter.
-func (b *Bookcase) Size() int {
-	return int(b.filter.Cap())
-}
-
 // ApproximateCount returns the approximate number of unique book titles stored in the Bookcase.
 func (b *Bookcase) ApproximateCount() int {
 	return int(b.filter.ApproximatedSize())
+}
+
+// Clear removes all book titles from the Bookcase.
+func (b *Bookcase) Clear() {
+	b.filter.ClearAll()
 }
 
 // AddBook adds a book title to the Bookcase.
