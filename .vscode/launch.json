@@ -9,6 +9,13 @@
             "type": "dotnet",
             "request": "launch",
             "projectPath": "${workspaceFolder}/AiDependencyMigrator/AiDependencyMigrator.csproj",
+        },
+        {
+            "name": ".NET Core Attach",
+            "type": "coreclr",
+            "request": "attach",
+            "preLaunchTask": ".NET Core Test with debugger",
+            "processName":"testhost.exe",
         }
     ]
 }

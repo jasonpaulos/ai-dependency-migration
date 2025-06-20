@@ -1,6 +1,8 @@
 using ModelContextProtocol.Server;
 using System.ComponentModel;
 
+namespace McpServer;
+
 [McpServerToolType]
 public static class FileSystemMcpServerTools
 {
@@ -38,14 +40,25 @@ public static class FileSystemMcpServerTools
         return baseDirectory;
     }
 
-    [McpServerTool, Description("Returns a list of files in the specified directory.")]
+    [McpServerTool, Description("""
+    Returns a list of all files and directories in the specified directory.
+    The returned list contains only the names of the files and directories, not their full paths.
+    Subdirectories are included in the list, with a trailing slash to indicate they are directories.
+    """)]
     public static string[] ListFilesInDirectory(string directory)
     {
         if (!IsValidPath(directory))
         {
             throw new ArgumentException("Invalid directory path.");
         }
-        return [.. Directory.GetFiles(directory).Select(file => Path.GetFileName(file))];
+        if (!Directory.Exists(directory))
+        {
+            throw new DirectoryNotFoundException($"The directory '{directory}' does not exist.");
+        }
+        var allFiles = Directory.GetFiles(directory).Select(file => Path.GetFileName(file));
+        var allDirectories = Directory.GetDirectories(directory)
+            .Select(dir => Path.GetFileName(dir) + "/");
+        return [.. allFiles, .. allDirectories];
     }
 
     [McpServerTool, Description("Reads the contents of a file.")]

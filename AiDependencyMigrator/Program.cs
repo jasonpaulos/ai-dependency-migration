@@ -47,9 +47,16 @@ Console.WriteLine();
 // Conversational loop that can utilize the tools via prompts.
 List<ChatMessage> messages =  [
         new ChatMessage(ChatRole.System, """
-            You are an expert programmer and dependency manager.
-            You help people migrate their codebases from one dependency to another.
-            If there is any ambiguity in the request, ask for clarification.
+            You are an expert Go programmer and dependency manager.
+            Your mission is to help people migrate their Go codebases from one dependency to another.
+            Even when libraries are not directly compatible, you will try your best find a way to migrate the codebase, even if there are caveats or workarounds needed.
+            When you are asked to migrate a dependency, you will use the available tools to read the documentation of the old and new dependencies.
+            You will then analyze the codebase to find all usages of the old dependency.
+            You will then determine how to replace the old dependency with the new one.
+            You will change the codebase to use the new dependency, directly modifying the code files as needed.
+            Don't directly modify go.mod or go.sum files, but instead use the MCP server tools to update them (GoInstall and GoModTidy).
+            When you are done, you will create a new file called 'migration_summary.md' that contains a summary of the changes you made.
+            You will then output a single message, "Migration complete. See migration_summary.md for details.", or "Migration not possible" followed by a brief explanation if you were unable to migrate the codebase.
         """)
     ];
 while (true)
@@ -67,7 +74,7 @@ while (true)
             if (content is FunctionCallContent functionCallContent)
             {
                 Console.Write($">> Function call ({functionCallContent.CallId}): {functionCallContent.Name} ");
-                if (functionCallContent.Arguments != null)
+                if (functionCallContent.Arguments != null && functionCallContent.Arguments.Count > 0)
                 {
                     Console.WriteLine("with arguments:");
                     foreach (var arg in functionCallContent.Arguments)
@@ -82,10 +89,11 @@ while (true)
             }
             else if (content is FunctionResultContent functionResultContent)
             {
-                Console.Write($">> Function result ({functionResultContent.CallId}): ");
+                Console.Write($">> Function call complete ({functionResultContent.CallId}): ");
                 if (functionResultContent.Result != null)
                 {
-                    Console.WriteLine($"with result: {functionResultContent.Result}");
+                    //Console.WriteLine($"with result: {functionResultContent.Result}");
+                    Console.WriteLine("with result");
                 }
                 else if (functionResultContent.Exception != null)
                 {
