@@ -87,14 +87,14 @@ public static class FileSystemMcpServerTools
         File.WriteAllText(filePath, content);
     }
 
-    [McpServerTool, Description("""
-    Insert the given content lines into a file at a specific line range.
-    The content will replace the existing lines in the specified range.
-    The line range is 1-based, meaning lineStart = 1 refers to the first line.
-    The end line is exclusive, meaning lineStart = 1 and lineEnd = 2 will replace the first line only.
-    The file must exist, and the specified range must be valid.
-    lineEnd must not exceed the number of lines already in the file, however setting lineEnd to -1 will be treated as the end of the file.
-    """)]
+    // [McpServerTool, Description("""
+    // Insert the given content lines into a file at a specific line range.
+    // The content will replace the existing lines in the specified range.
+    // The line range is 1-based, meaning lineStart = 1 refers to the first line.
+    // The end line is exclusive, meaning lineStart = 1 and lineEnd = 2 will replace the first line only.
+    // The file must exist, and the specified range must be valid.
+    // lineEnd must not exceed the number of lines already in the file, however setting lineEnd to -1 will be treated as the end of the file.
+    // """)]
     public static void WriteFileLines(string filePath, string[] contentLines, int lineStart, int lineEnd)
     {
         if (!IsValidPath(filePath) || !File.Exists(filePath))

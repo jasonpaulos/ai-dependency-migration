@@ -44,6 +44,8 @@ foreach (McpClientTool tool in tools)
 }
 Console.WriteLine();
 
+// Update my go project to use the package github.com/seiflotfy/cuckoofilter instead of github.com/bits-and-blooms/bloom/v3
+
 // Conversational loop that can utilize the tools via prompts.
 List<ChatMessage> messages =  [
         new ChatMessage(ChatRole.System, """
@@ -55,18 +57,25 @@ List<ChatMessage> messages =  [
             You will then determine how to replace the old dependency with the new one.
             You will change the codebase to use the new dependency, directly modifying the code files as needed.
             Don't directly modify go.mod or go.sum files, but instead use the MCP server tools to update them (GoInstall and GoModTidy).
+            You will ensure all tests pass after the migration. If they do not, you will make the necessary code changes to ensure they pass with the new dependency.
             When you are done, you will create a new file called 'migration_summary.md' that contains a summary of the changes you made.
-            You will then output a single message, "Migration complete. See migration_summary.md for details.", or "Migration not possible" followed by a brief explanation if you were unable to migrate the codebase.
+            You will then output a single message to the user, "Migration complete. See migration_summary.md for details.", or "Migration not possible" followed by a brief explanation if you were unable to migrate the codebase.
         """)
     ];
+
+Console.Write("Prompt: ");
+messages.Add(new(ChatRole.User, Console.ReadLine()));
+
 while (true)
 {
-    Console.Write("Prompt: ");
-    messages.Add(new(ChatRole.User, Console.ReadLine()));
+    if (messages.Last().Role == ChatRole.Assistant)
+    {
+        break;
+    }
 
     List<ChatResponseUpdate> updates = [];
     await foreach (ChatResponseUpdate update in client
-        .GetStreamingResponseAsync(messages, new() { Tools = [.. tools] }))
+        .GetStreamingResponseAsync(messages, new() { Tools = [.. tools], AllowMultipleToolCalls = true }))
     {
         // Debugging info to show function calls and results.
         foreach (var content in update.Contents)
@@ -112,3 +121,5 @@ while (true)
 
     messages.AddMessages(updates);
 }
+
+Console.WriteLine("Exiting");

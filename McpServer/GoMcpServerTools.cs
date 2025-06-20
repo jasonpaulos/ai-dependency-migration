@@ -39,10 +39,9 @@ public static class GoMcpServerTools
     }
 
     [McpServerTool, Description("""
-    Install a go package in the specified directory.
-    If the package version is not specified, it will install the latest version.
+    Install a go package in the specified directory using 'go get'.
     """)]
-    public static void GoInstall(string directory, string packageName, string? packageVersion)
+    public static void GoGetPackage(string directory, string packageName)
     {
         if (!IsValidPath(directory))
         {
@@ -56,13 +55,7 @@ public static class GoMcpServerTools
         {
             throw new DirectoryNotFoundException($"The directory '{directory}' does not exist.");
         }
-        string arguments = $"get {packageName}";
-        if (!string.IsNullOrWhiteSpace(packageVersion))
-        {
-            arguments += $"@v{packageVersion}";
-        }
-
-        ProcessHelper.RunProcess("go", arguments, directory);
+        ProcessHelper.RunProcess("go", $"get {packageName}", directory);
     }
 
     [McpServerTool, Description("""
@@ -80,6 +73,25 @@ public static class GoMcpServerTools
         }
 
         ProcessHelper.RunProcess("go", "mod tidy", directory);
+    }
+
+    [McpServerTool, Description("""
+    Run all go tests in the specified directory.
+    Usually this is the root of a Go module.
+    The output of the tests will be returned as a string.
+    """)]
+    public static string GoRunTests(string directory)
+    {
+        if (!IsValidPath(directory))
+        {
+            throw new ArgumentException("Invalid directory path.");
+        }
+        if (!Directory.Exists(directory))
+        {
+            throw new DirectoryNotFoundException($"The directory '{directory}' does not exist.");
+        }
+
+        return ProcessHelper.RunProcess("go", "test ./...", directory);
     }
 
     [McpServerTool, Description("""
